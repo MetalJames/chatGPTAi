@@ -21,7 +21,7 @@ function loader(element: any) {
             element.textContent = '';
         }
     }, 300);
-}
+};
 
 function typeText(element: any, text: string) {
     let index = 0;
@@ -34,7 +34,7 @@ function typeText(element: any, text: string) {
             clearInterval(interval)
         }
     }, 20)
-}
+};
 
 // generate unique ID for each message div of bot
 // necessary for typing text effect for that specific reply
@@ -45,13 +45,7 @@ function generateUniqueId() {
     const hexadecimalString = randomNumber.toString(16);
 
     return `id-${timestamp}-${hexadecimalString}`;
-}
-
-// type ChatStripeProps = {
-//     isAi: boolean
-//     value?: any
-//     uniqueId?: string
-// }
+};
 
 function chatStripe(isAi: boolean, value?: any, uniqueId?: string) {
     return (
@@ -69,22 +63,22 @@ function chatStripe(isAi: boolean, value?: any, uniqueId?: string) {
         </div>
     `
     )
-}
+};
 
 const handleSubmit = async (e: any) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const data = new FormData(form)
+    const data = new FormData(form);
 
     // user's chatstripe
-    chatContainer.innerHTML += chatStripe(false, data.get('prompt'))
+    chatContainer.innerHTML += chatStripe(false, data.get('prompt'));
 
     // to clear the textarea input 
-    form.reset()
+    form.reset();
 
     // bot's chatstripe
-    const uniqueId = generateUniqueId()
-    chatContainer.innerHTML += chatStripe(true, " ", uniqueId)
+    const uniqueId = generateUniqueId();
+    chatContainer.innerHTML += chatStripe(true, " ", uniqueId);
 
     // to focus scroll to the bottom 
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -96,34 +90,35 @@ const handleSubmit = async (e: any) => {
     loader(messageDiv);
 
     // const response = await fetch('https://codex-im0y.onrender.com/', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         prompt: data.get('prompt')
-    //     })
-    // })
+    const response = await fetch('http://localhost:5000', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            prompt: data.get('prompt')
+        })
+    });
 
-    // clearInterval(loadInterval)
-    // messageDiv.innerHTML = " "
+    clearInterval(loadInterval);
+    messageDiv.innerHTML = " ";
 
-    // if (response.ok) {
-    //     const data = await response.json();
-    //     const parsedData = data.bot.trim() // trims any trailing spaces/'\n' 
+    if (response.ok) {
+        const data = await response.json();
+        const parsedData = data.bot.trim(); // trims any trailing spaces/'\n' 
 
-    //     typeText(messageDiv, parsedData)
-    // } else {
-    //     const err = await response.text()
+        typeText(messageDiv, parsedData);
+    } else {
+        const err = await response.text();
 
-    //     messageDiv.innerHTML = "Something went wrong"
-    //     alert(err)
-    // }
-}
+        messageDiv.innerHTML = "Something went wrong";
+        alert(err);
+    }
+};
 
-form.addEventListener('submit', handleSubmit)
+form.addEventListener('submit', handleSubmit);
 form.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
         handleSubmit(e)
     }
-})
+});
